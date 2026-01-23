@@ -4,9 +4,10 @@ import java.io.*;
 import java.util.Scanner;
 
 public class main {
+    QOL f = new QOL();
 
     public static String ping(int packet_size, int ttl, String target) {
-         try {
+        try {
             ProcessBuilder pb;
             String cmd = String.format("ping -f -l %d -n 1 -i %d %s", packet_size, ttl, target); // build command
 
@@ -35,11 +36,13 @@ public class main {
         return "";
     }
     public static void run_ping(int packet_size, int max_hops, String target, List<Router> routerList) {
-
+        
         for (int i = 1; i <= max_hops; i++) {
 
             Router router = createRouter(ping(packet_size, i, target), packet_size, "ICMP");  
-
+            if (i == 1) {
+                router.setClient(true);
+            }
             if (i > 1) { // ensure not first router
 
                 Router existingRouter = doesRouterExist(router.getIPAddress(), routerList);
@@ -57,10 +60,39 @@ public class main {
 
                 router.connectRouter(prevRouter); // connect to previous router
             }
+            if (router.getIPAddress().equals(target)) {
+                router.setTarget(true);
+            }
 
             routerList.add(router); // add new router to list
 
         }
+    }
+
+    public static String resolveIP(String hostname) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "nslookup " + hostname);
+            Process process = pb.start();
+
+            QOL f = new QOL(); // ==============================================================================================================================
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            String line;
+            String[] parts = new String[3];
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("Address:")) {
+                    // extract the ip address from the line
+                    parts = line.split(" ");
+                }
+ 
+            }
+            return parts[2];
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public static Router doesRouterExist(String ipAddress, List<Router> routerList) {
@@ -79,7 +111,6 @@ public class main {
         }
         return null;
     }
-
 
     public static Router createRouter(String ipAddress, int packetSize, String packetType) {
         Router router = new Router(ipAddress, packetSize);
@@ -112,7 +143,7 @@ public class main {
         
         // get user input
         f.print("Enter target hostname or IP address: ");
-        String target = scan.nextLine();
+        String target = resolveIP(scan.nextLine());
         f.print("Enter packet size (in bytes): ");
         int packetSize = scan.nextInt();
         f.print("Enter max hops: ");
@@ -123,13 +154,20 @@ public class main {
         for (int i = 1; i <= 4; i++) {
             run_ping((packetSize/4)*i, maxHops, target, routerList);
         }
-        
+
         routerList = removeDuplicateRouters(routerList);
-        
+
         for (Router router : routerList) {
             router.displayInfo();
             f.blank();
         }
+    
 
+
+
+
+
+        
+        scan.close();
     }
 }

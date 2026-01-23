@@ -5,6 +5,8 @@ public class Router {
     int packetSize = 0;
     List<String> packetTypes;
     List<Router> connectedRouters;
+    boolean client = false;
+    boolean target = false;
 
     QOL f = new QOL();
 
@@ -38,8 +40,20 @@ public class Router {
         }
     }
 
+    public void setClient(boolean isClient) {
+        this.client = isClient;
+    }
+
+    public void setTarget(boolean isTarget) {
+        this.target = isTarget;
+    }
+
     public void displayInfo() {
-        f.println("Router IP Address: " + IPAddress);
+        f.print("Router IP Address: " + IPAddress);
+        if (client) {f.print(" (Client)");}
+        if (target) {f.print(" (Target)");}
+        f.blank();
+
         f.println("Packet Size: " + packetSize);
         f.println("Supported Packet Types: " + String.join(", ", packetTypes));
         f.println("Connected Routers: ");
@@ -62,5 +76,13 @@ public class Router {
 
     public List<Router> getConnectedRouters() {
         return connectedRouters;
+    }
+
+    public boolean isClient() {
+        return client;
+    }
+
+    public boolean isTarget() {
+        return target;
     }
 }
