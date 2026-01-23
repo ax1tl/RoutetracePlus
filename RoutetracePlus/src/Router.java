@@ -6,13 +6,13 @@ public class Router {
     List<String> packetTypes;
     List<Router> connectedRouters;
 
+    QOL f = new QOL();
+
     public Router(String IPAddress, int packetSize) {
         this.IPAddress = IPAddress;
         this.packetSize = packetSize;
         this.packetTypes = new ArrayList<>();
         this.connectedRouters = new ArrayList<>();
-
-
     }
 
     public void connectRouter(Router router) {
@@ -20,16 +20,31 @@ public class Router {
     }
 
     public void addPacketType(String packetType) {
-        packetTypes.add(packetType);
+        String type = packetType.toUpperCase();
+
+        if (type == "ICMP" || type == "TCP" || type == "UDP"){
+            packetTypes.add(packetType);
+        } else {
+            f.println("Unsupported packet type: " + packetType);
+        }
+    }
+    public void removePacketType(String packetType) {
+        packetTypes.remove(packetType);
+    }
+
+    public void updatePacketSize(int newSize) {
+        if (newSize > packetSize){
+            packetSize = newSize;
+        }
     }
 
     public void displayInfo() {
-        System.out.println("Router IP Address: " + IPAddress);
-        System.out.println("Packet Size: " + packetSize);
-        System.out.println("Supported Packet Types: " + String.join(", ", packetTypes));
-        System.out.println("Connected Routers: ");
+        f.println("Router IP Address: " + IPAddress);
+        f.println("Packet Size: " + packetSize);
+        f.println("Supported Packet Types: " + String.join(", ", packetTypes));
+        f.println("Connected Routers: ");
         for (Router router : connectedRouters) {
-            System.out.println(" - " + router.IPAddress);
+            f.println(" - " + router.IPAddress);
         }
     }
 
