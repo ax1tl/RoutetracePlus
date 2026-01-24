@@ -1,6 +1,7 @@
 public class QOL {
 
     public void println(int message)        {System.out.println(message);}
+    public void println(byte message)       {System.out.println(message);}
     public void println(char message)       {System.out.println(message);}
     public void println(long message)       {System.out.println(message);}
     public void println(float message)      {System.out.println(message);}
@@ -10,6 +11,7 @@ public class QOL {
     public void println(boolean message)    {System.out.println(message);}
 
     public void print(int message)          {System.out.print(message);}
+    public void print(byte message)       {System.out.print(message);}
     public void print(char message)         {System.out.print(message);}
     public void print(long message)         {System.out.print(message);}
     public void print(float message)        {System.out.print(message);}
