@@ -5,16 +5,18 @@ public class Router {
     int packetSize = 0;
     List<String> packetTypes;
     List<Router> connectedRouters;
-    boolean client = false;
+    boolean source = false;
     boolean target = false;
+    int id = 0;
 
     QOL f = new QOL();
 
-    public Router(String IPAddress, int packetSize) {
+    public Router(String IPAddress, int packetSize, int id) {
         this.IPAddress = IPAddress;
         this.packetSize = packetSize;
         this.packetTypes = new ArrayList<>();
         this.connectedRouters = new ArrayList<>();
+        this.id = id;
     }
 
     public void connectRouter(Router router) {
@@ -40,8 +42,8 @@ public class Router {
         }
     }
 
-    public void setClient(boolean isClient) {
-        this.client = isClient;
+    public void setSource(boolean isSource) {
+        this.source = isSource;
     }
 
     public void setTarget(boolean isTarget) {
@@ -49,8 +51,8 @@ public class Router {
     }
 
     public void displayInfo() {
-        f.print("Router IP Address: " + IPAddress);
-        if (client) {f.print(" (Client)");}
+        f.print("[" + this.id + "] \tRouter IP Address: " + IPAddress);
+        if (source) {f.print(" (Source)");}
         if (target) {f.print(" (Target)");}
         f.blank();
 
@@ -58,7 +60,7 @@ public class Router {
         f.println("Supported Packet Types: " + String.join(", ", packetTypes));
         f.println("Connected Routers: ");
         for (Router router : connectedRouters) {
-            f.println(" - " + router.IPAddress);
+            f.println("[" + router.id + "] " + router.IPAddress);
         }
     }
 
@@ -78,8 +80,12 @@ public class Router {
         return connectedRouters;
     }
 
-    public boolean isClient() {
-        return client;
+    public int getID() {
+        return id;
+    }
+
+    public boolean isSource() {
+        return source;
     }
 
     public boolean isTarget() {
