@@ -51,7 +51,7 @@ public class Router {
     }
 
     public void displayInfo() {
-        f.print("[" + this.id + "] \tRouter IP Address: " + IPAddress);
+        f.print("[" + this.id + "] Router IP Address: " + IPAddress);
         if (source) {f.print(" (Source)");}
         if (target) {f.print(" (Target)");}
         f.blank();
@@ -74,6 +74,9 @@ public class Router {
 
     public List<String> getPacketTypes() {
         return packetTypes;
+    }
+    public boolean hasPacketType(String packetType) {
+        return packetTypes.contains(packetType);
     }
 
     public List<Router> getConnectedRouters() {
