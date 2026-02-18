@@ -11,7 +11,7 @@ public class QOL {
     public void println(boolean message)    {System.out.println(message);}
 
     public void print(int message)          {System.out.print(message);}
-    public void print(byte message)       {System.out.print(message);}
+    public void print(byte message)         {System.out.print(message);}
     public void print(char message)         {System.out.print(message);}
     public void print(long message)         {System.out.print(message);}
     public void print(float message)        {System.out.print(message);}
@@ -69,5 +69,7 @@ public class QOL {
             e.printStackTrace();
         }
     }
+
+    
 
 }

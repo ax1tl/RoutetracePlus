@@ -8,6 +8,7 @@ public class Router {
     boolean source = false;
     boolean target = false;
     int id = 0;
+    int ipv = 0;
 
     QOL f = new QOL();
 
@@ -17,6 +18,7 @@ public class Router {
         this.packetTypes = new ArrayList<>();
         this.connectedRouters = new ArrayList<>();
         this.id = id;
+        this.ipv = determineIPVersion(IPAddress);
     }
 
     public void connectRouter(Router router) {
