@@ -7,13 +7,26 @@ public class main {
     static QOL f = new QOL();
     static int id = 0;
 
+    public static int determineIPVersion(String ipAddress) {
+        if (ipAddress.contains(":")) {
+            return 6; // IPv6
+        } else if (ipAddress.contains(".")) {
+            return 4; // IPv4
+        } else {
+            return 0; // Unknown format
+        }
+    }
+
     public static String ping(int packet_size, int ttl, String target) {
         try {
             ProcessBuilder pb;
-            String cmd = String.format("ping -f -l %d -n 1 -i %d %s", packet_size, ttl, target); // build command
-
-            pb = new ProcessBuilder("cmd.exe", "/c", cmd);
-
+            if (determineIPVersion(target) == 6) {
+                String cmd = String.format("ping -l %d -n 1 -i %d %s", packet_size, ttl, target); // build command
+                pb = new ProcessBuilder("cmd.exe", "/c", cmd);
+            } else {
+                String cmd = String.format("ping -f -l %d -n 1 -i %d %s", packet_size, ttl, target); // build command
+                pb = new ProcessBuilder("cmd.exe", "/c", cmd);
+            }
             Process process = pb.start();
 
             BufferedReader reader =
@@ -21,7 +34,7 @@ public class main {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                //f.println("ttl: " + ttl + " -> " + line);
+                f.println("ttl: " + ttl + " -> " + line);
                 if (line.contains("Reply from")) {
                     // extract the ip address from the line
                     String[] parts = line.split(" ");
@@ -145,11 +158,16 @@ public class main {
             String line;
             String[] parts = new String[3];
             while ((line = reader.readLine()) != null) {
-                if (line.contains("Address")) {
+                //f.println(line);
+                if (line.contains(".")) { // crude way to find the line containing the ipv4 address
                     // extract the ip address from the line
                     parts = line.split(" ");
                     parts[2].replace(" ", "");
                 }
+            }
+            if (parts[2].equals(" ") || parts[2].equals("")) {
+                f.println("Failed to resolve IP address for hostname: " + hostname);
+                return "";
             }
             return parts[2];
 
@@ -187,6 +205,7 @@ public class main {
             router.addPacketType(packetType);
             router.updatePacketSize(packetSize);
             routerList.add(router);
+            router.setIPVersion(router.determineIPVersion(ipAddress));
             id++;
         }
         return router;
@@ -214,7 +233,7 @@ public class main {
             // retrieve the router ipaddress
             // create router object
             // get next router, create object, connect to previous router
-        
+    
         // get user input
         f.print("Enter target hostname or IP address: ");
         String target = resolveIP(scan.nextLine());
@@ -232,13 +251,18 @@ public class main {
         for (int i = 1; i <= 4; i++) {
             run_ping((packetSize/4)*i, maxHops, target, routerList);
         }
-            
+    
+        
         /*
-        Router r1 = createRouter(resolveIP("draconium.net"), 64, "ICMP", routerList);
+        Router r1 = createRouter(resolveIP("draconium.music"), 64, "ICMP", routerList);
         Router r2 = createRouter("2.2.2.2", 128, "TCP", routerList);
         Router r3 = createRouter("3.3.3.3", 256, "UDP", routerList);
         Router r4 = createRouter("185.62.73.53", 512, "TCP", routerList);
         */
+
+
+        //ping(1024, 30, resolveIP("draconium.music"));
+        //f.println(resolveIP("draconium.music"));
         
         routerList = removeDuplicateRouters(routerList);
         
@@ -256,5 +280,5 @@ public class main {
 
 /*
 Bugs:
-IPv6 unsupported currently.
+IPv6 pings unsupported currently.
 */

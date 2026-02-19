@@ -57,6 +57,7 @@ public class Router {
         if (source) {f.print(" (Source)");}
         if (target) {f.print(" (Target)");}
         f.blank();
+        f.println("Version: IPv" + ipv);
 
         f.println("Packet Size: " + packetSize);
         f.println("Supported Packet Types: " + String.join(", ", packetTypes));
@@ -95,5 +96,23 @@ public class Router {
 
     public boolean isTarget() {
         return target;
+    }
+
+    public int determineIPVersion(String ipAddress) {
+        if (ipAddress.contains(":")) {
+            return 6; // IPv6
+        } else if (ipAddress.contains(".")) {
+            return 4; // IPv4
+        } else {
+            return 0; // Unknown format
+        }
+    }
+
+    public int getIPVersion() {
+        return ipv;
+    }
+
+    public void setIPVersion(int version) {
+        this.ipv = version;
     }
 }
