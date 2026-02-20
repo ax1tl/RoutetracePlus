@@ -4,8 +4,11 @@ import java.io.*;
 import java.util.Scanner;
 
 public class main {
+    static boolean DEBUG = true;
+
     static QOL f = new QOL();
     static int id = 0;
+    static List<String> domains = new ArrayList<>();
 
     public static int determineIPVersion(String ipAddress) {
         if (ipAddress.contains(":")) {
@@ -34,7 +37,7 @@ public class main {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                f.println("ttl: " + ttl + " -> " + line);
+                //f.print("\r\033[0K" + line);
                 if (line.contains("Reply from")) {
                     // extract the ip address from the line
                     String[] parts = line.split(" ");
@@ -148,7 +151,14 @@ public class main {
         return "";
     }
 
+    public static boolean isIP(String input) {
+        return input.matches("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b") || input.matches("([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}");
+    }
     public static String resolveIP(String hostname) {
+        if (DEBUG) f.println("check resolveIP()");
+        if (isIP(hostname)) {
+            return hostname;
+        }
         try {
             ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "nslookup " + hostname);
             Process process = pb.start();
@@ -158,14 +168,20 @@ public class main {
             String line;
             String[] parts = new String[3];
             while ((line = reader.readLine()) != null) {
-                //f.println(line);
+                f.print("\r\033[0K" + line);
+                
+                if (line.contains("***")){ // fail case 1
+                    f.println("Failed to resolve IP address for hostname: " + hostname);
+                    return "";
+                }
+
                 if (line.contains(".")) { // crude way to find the line containing the ipv4 address
                     // extract the ip address from the line
                     parts = line.split(" ");
                     parts[2].replace(" ", "");
                 }
             }
-            if (parts[2].equals(" ") || parts[2].equals("")) {
+            if (parts[2].equals(" ") || parts[2].equals("") || !hostname.contains(".")) { // fail case 2
                 f.println("Failed to resolve IP address for hostname: " + hostname);
                 return "";
             }
@@ -236,7 +252,14 @@ public class main {
     
         // get user input
         f.print("Enter target hostname or IP address: ");
-        String target = resolveIP(scan.nextLine());
+        String next = scan.nextLine();
+        String target = resolveIP(next);
+        if (target.equals("")) {
+            scan.close();
+            f.println("Program failed to recognize target IP address. Please check the hostname/IP and try again.");
+            return;
+        }
+
         
         f.println("Resolved target IP address: " + target);
         
@@ -266,7 +289,12 @@ public class main {
         
         routerList = removeDuplicateRouters(routerList);
         
+        
         for (Router router : routerList) {
+            if (router.getIPVersion() == 0){
+                router = null;
+                continue;
+            }
             router.displayInfo();
             f.blank();
         }
